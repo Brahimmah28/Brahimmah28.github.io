@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>تأكيد البريد الإلكتروني</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <h1>جاري تأكيد بريدك الإلكتروني...</h1>
+    <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyBBCvm6Stbf5gwhP7WwyT_SzZWCkc5zOQY",
+    authDomain: "proj-3a555.firebaseapp.com",
+    projectId: "proj-3a555",
+    storageBucket: "proj-3a555.firebasestorage.app",
+    messagingSenderId: "1029150981941",
+    appId: "1:1029150981941:web:9f12869810b6d0673e167c"
+};
+
+        firebase.initializeApp(firebaseConfig);
+
+        const oobCode = new URLSearchParams(window.location.search).get('oobCode');
+        if (oobCode) {
+            firebase.auth().applyActionCode(oobCode)
+                .then(() => {
+                    alert("تم تأكيد البريد بنجاح!");
+                    window.location.href = "/"; // توجيه إلى الصفحة الرئيسية
+                })
+                .catch((error) => {
+                    alert("خطأ: " + error.message);
+                });
+        } else {
+            alert("رابط التأكيد غير صالح!");
+        }
+    </script>
+</body>
+</html>
