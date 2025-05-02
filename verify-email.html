@@ -1,14 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تأكيد البريد الإلكتروني</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <!-- تضمين مكتبات Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <h1>جاري تأكيد بريدك الإلكتروني...</h1>
+    <div class="container">
+        <h1>تأكيد البريد الإلكتروني</h1>
+        <p id="status">جاري معالجة طلبك...</p>
+    </div>
+
     <script>
-const firebaseConfig = {
+        // الكود الذي ذكرته بالضبط
+        const firebaseConfig = {
     apiKey: "AIzaSyBBCvm6Stbf5gwhP7WwyT_SzZWCkc5zOQY",
     authDomain: "proj-3a555.firebaseapp.com",
     projectId: "proj-3a555",
@@ -19,18 +43,28 @@ const firebaseConfig = {
 
         firebase.initializeApp(firebaseConfig);
 
-        const oobCode = new URLSearchParams(window.location.search).get('oobCode');
-        if (oobCode) {
-            firebase.auth().applyActionCode(oobCode)
+        const auth = firebase.auth();
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const oobCode = urlParams.get('oobCode');
+        const mode = urlParams.get('mode');
+        const apiKey = urlParams.get('apiKey');
+
+        if (!oobCode || !mode || !apiKey) {
+            document.getElementById('status').innerHTML = "رابط التأكيد ناقص المعلمات المطلوبة!";
+            console.error("المعلمات المفقودة:", { mode, oobCode, apiKey });
+        } else if (mode === "verifyEmail" && oobCode) {
+            auth.applyActionCode(oobCode)
                 .then(() => {
-                    alert("تم تأكيد البريد بنجاح!");
-                    window.location.href = "/"; // توجيه إلى الصفحة الرئيسية
+                    document.getElementById('status').innerHTML = "تم تأكيد البريد بنجاح! سيتم توجيهك خلال 3 ثوان...";
+                    setTimeout(() => window.location.href = "/", 3000);
                 })
                 .catch((error) => {
-                    alert("خطأ: " + error.message);
+                    document.getElementById('status').innerHTML = `خطأ في التأكيد: ${error.message}`;
+                    console.error("تفاصيل الخطأ:", error);
                 });
         } else {
-            alert("رابط التأكيد غير صالح!");
+            document.getElementById('status').innerHTML = "رابط التأكيد غير صالح!";
         }
     </script>
 </body>
